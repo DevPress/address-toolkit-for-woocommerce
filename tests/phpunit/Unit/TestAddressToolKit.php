@@ -1,10 +1,10 @@
 <?php
 
-namespace AddressToolkit\Test\Unit;
+namespace Address_Toolkit\Test\Unit;
 
 use WP_UnitTestCase;
 use WC_Helper_Order;
-use AddressToolkit;
+use Address_Toolkit;
 
 class Basic_Test extends WP_UnitTestCase {
 	/**
