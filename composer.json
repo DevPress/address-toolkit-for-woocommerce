@@ -1,0 +1,40 @@
+{
+    "name": "devpress/address-toolkit",
+    "description": "",
+    "keywords": [ "wordpress" ],
+    "type": "wordpress-plugin",
+    "homepage": "https://github.com/devpress/address-toolkit-for-woocommerce",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Devin Price",
+            "homepage": "https://devpress.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/devpress/address-toolkit-for-woocommerce/issues",
+        "source": "https://github.com/devpress/address-toolkit-for-woocommerce"
+    },
+    "require-dev": {
+        "automattic/vipwpcs": "^2.3",
+        "assertwell/wp-core-test-framework": "^0.1.1",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "php": ">=7.4",
+        "phpunit/phpunit": "^7",
+        "yoast/phpunit-polyfills": "^1.0",
+        "wp-cli/i18n-command": "^2.2.5"
+    },
+    "scripts": {
+        "make-pot": "wp i18n make-pot . languages/address-toolkit.pot"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AddressToolkit\\Test\\": "tests/phpunit/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
