@@ -21,10 +21,13 @@ class AddressToolkit {
 	};
 
 	initAutocomplete = (field, type) => {
-		const country = document.getElementById(`${type}_country`);
-		const state = document.getElementById(`${type}_state`);
-		const city = document.getElementById(`${type}_city`);
-		const postcode = document.getElementById(`${type}_postcode`);
+		const fieldInputs = {
+			address1: field,
+			city: document.getElementById(`${type}_city`),
+			state: document.getElementById(`${type}_state`),
+			country: document.getElementById(`${type}_country`),
+			postcode: document.getElementById(`${type}_postcode`),
+		};
 
 		// Initialize Places Autocomplete on Address 1.
 		const address = new google.maps.places.Autocomplete(field, {
@@ -33,14 +36,14 @@ class AddressToolkit {
 		});
 
 		// If the country value field is set, we'll only return results from that country.
-		this.setCountryRestriction(address, country.value);
-		country.addEventListener("change", () => {
-			this.setCountryRestriction(address, country.value);
+		this.setCountryRestriction(address, fieldInputs.country.value);
+		fieldInputs.country.addEventListener("change", () => {
+			this.setCountryRestriction(address, fieldInputs.country.value);
 		});
 
-		// Listen for an autocomplete selection.
+		// Listen for an autocomplete selection and set new values.
 		google.maps.event.addListener(address, "place_changed", () => {
-			this.parsePlace(address);
+			this.parsePlace(address, fieldInputs);
 		});
 	};
 
@@ -56,7 +59,7 @@ class AddressToolkit {
 		});
 	};
 
-	parsePlace = (address) => {
+	parsePlace = (address, fieldInputs) => {
 		console.log("place change");
 		let place = address.getPlace();
 		let address1 = "";
@@ -65,7 +68,46 @@ class AddressToolkit {
 
 		for (let i = 0; i < place.address_components.length; i++) {
 			const type = place.address_components[i].types[0];
-			console.log(type);
+			const shortName = place.address_components[i].short_name;
+			const longName = place.address_components[i].long_name;
+			console.log(type, shortName, longName);
+
+			if (type === "street_number") {
+				address1 = longName;
+				continue;
+			}
+
+			if (type === "route") {
+				address2 = longName;
+				continue;
+			}
+
+			// City.
+			if (type === "sublocality_level_1" || type === "locality") {
+				fieldInputs.city.setAttribute("value", longName);
+				continue;
+			}
+
+			// State.
+			if (type === "administrative_area_level_1") {
+				// @TODO Set state.
+				continue;
+			}
+
+			// Country.
+			if (type === "administrative_area_level_1") {
+				fieldInputs.country.setAttribute("value", shortName);
+				// @TODO Trigger change event.
+				continue;
+			}
+
+			// Postal code.
+			if (type === "postal_code") {
+				fieldInputs.postcode.setAttribute("value", longName);
+				continue;
+			}
+
+			// @TODO Populate address 1 field.
 		}
 	};
 }
