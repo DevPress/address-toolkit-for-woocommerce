@@ -22,14 +22,14 @@
  */
 class Address_Toolkit {
 
-	/** @var WC_Coupon_Restrictions */
+	/** @var Address_Toolkit */
 	public static $instance;
 
 	/** @var string */
-	public $version = '1.0.0';
+	public static $version = '1.0.0';
 
 	/** @var string */
-	public $required_woo = '5.6.0';
+	public static $required_woo = '5.6.0';
 
 	/** @var URL for loading assets. **/
 	public static string $url;
@@ -42,7 +42,7 @@ class Address_Toolkit {
 	 *
 	 * Ensures only one instance of the Address_Toolkit is loaded or can be loaded.
 	 *
-	 * @return AddressToolkit - Main instance.
+	 * @return Address_Toolkit - Main instance.
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -58,6 +58,10 @@ class Address_Toolkit {
 	public function __construct() {
 		self::$url = plugin_dir_url( __FILE__ );
 		self::$dir = plugin_dir_path( __FILE__ );
+
+		// Enqueue scripts and styles.
+		require_once self::$dir . '/includes/class-enqueue.php';
+		new Address_Toolkit\Enqueue();
 
 		// Loads the settings page.
 		add_filter( 'woocommerce_integrations', array( $this, 'add_integration' ) );

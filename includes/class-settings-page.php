@@ -10,7 +10,7 @@ class Settings_Page extends \WC_Integration {
 	 * Initialize the integration.
 	 */
 	public function __construct() {
-		$this->id                 = 'address-toolkit';
+		$this->id                 = 'addresstoolkit';
 		$this->method_title       = __( 'Address Toolkit', 'address-toolkit' );
 		$this->method_description = __( 'An integration with Google Cloud APIs for address autocomplete and verification.', 'address-toolkit' );
 
