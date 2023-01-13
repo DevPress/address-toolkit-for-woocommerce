@@ -26,14 +26,45 @@ class Settings_Page extends \WC_Integration {
 	 * Initialize integration settings form fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = array(
+		$this->form_fields = $this->get_settings();
+	}
+
+	/**
+	 * Returns the settings array.
+	 *
+	 * @return array
+	 */
+	public function get_settings() {
+		return array(
 			'api_key' => array(
-				'id'          => 'addresstoolkit-api-key',
+				'id'          => 'addresstoolkit_api_key',
 				'title'       => __( 'Google Cloud API Key', 'address-toolkit' ),
 				'type'        => 'password',
 				'description' => 'Enter API key for address autocomplete. <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">Google API Key</a>.',
 				'css'         => 'min-width:300px;',
 			),
+
+			// @todo Add country_restrictions with multi_select_countries type.
+			'example' => array(
+				'title'   => __( 'Sell to specific countries', 'woocommerce' ),
+				'desc'    => '',
+				'id'      => 'woocommerce_specific_allowed_countries',
+				'css'     => 'min-width: 350px;',
+				'default' => '',
+				'type'    => 'multi_select_countries',
+			),
+		);
+	}
+
+	/**
+	 * Output the gateway settings screen.
+	 */
+	public function admin_options() {
+		echo '<h2>' . esc_html( parent::get_method_title() ) . '</h2>';
+		echo wp_kses_post( wpautop( parent::get_method_description() ) );
+		echo '<div><input type="hidden" name="section" value="' . esc_attr( $this->id ) . '" /></div>';
+		\WC_Admin_Settings::output_fields(
+			$this->get_settings()
 		);
 	}
 }

@@ -33,6 +33,16 @@ class Enqueue {
 	}
 
 	/**
+	 * Returns the Google Places API key.
+	 *
+	 * @return string
+	 */
+	public static function get_api_key() {
+		$settings = get_option( 'woocommerce_addresstoolkit_settings' );
+		return $settings['api_key'] ?? false;
+	}
+
+	/**
 	 * Enqueue styles and scripts.
 	 *
 	 * @return void
@@ -44,8 +54,7 @@ class Enqueue {
 			return;
 		}
 
-		$settings = get_option( 'woocommerce_addresstoolkit_settings' );
-		$api_key  = $settings['api_key'] ?? false;
+		$api_key = self::get_api_key();
 
 		// We need the API to continue.
 		if ( ! $api_key ) {
@@ -81,32 +90,11 @@ class Enqueue {
 		// Add vars to the script.
 		wp_localize_script(
 			'addresstoolkit',
-			'addresstoolkit_vars',
+			'addresstoolkit',
 			array(
-				'geo_country' => self::get_geo_country_user(),
+				'country_restrictions' => '',
 			)
 		);
-	}
-
-	/**
-	 * Get user country from geolocation.
-	 *
-	 * @return string
-	 */
-	protected static function get_geo_country_user() {
-		$user_ip = \WC_Geolocation::get_ip_address();
-
-		if ( ! $user_ip ) {
-			return '';
-		}
-
-		$user_geo = \WC_Geolocation::geolocate_ip( $user_ip );
-
-		if ( isset( $user_geo['country'] ) && $user_geo['country'] ) {
-			return $user_geo['country'];
-		}
-
-		return '';
 	}
 
 }
