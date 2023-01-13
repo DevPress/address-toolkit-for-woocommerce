@@ -64,18 +64,16 @@ class Address_Toolkit {
 		new Address_Toolkit\Enqueue();
 
 		// Loads the settings page.
-		add_filter( 'woocommerce_integrations', array( $this, 'add_integration' ) );
+		add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings' ) );
 	}
 
 	/**
-	 * Adds a new section to the WooCommerce integration settings.
+	 * Adds a new WooCommerce Settings page.
 	 */
-	public function add_integration( $integrations ) {
+	public function add_settings( $settings ) {
 		require_once self::$dir . '/includes/class-settings-page.php';
-		new Address_Toolkit\Settings_Page();
-
-		$integrations[] = 'Address_Toolkit\Settings_Page';
-		return $integrations;
+		$settings[] = new Address_Toolkit\Settings();
+		return $settings;
 	}
 
 }

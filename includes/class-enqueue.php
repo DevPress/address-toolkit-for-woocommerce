@@ -33,16 +33,6 @@ class Enqueue {
 	}
 
 	/**
-	 * Returns the Google Places API key.
-	 *
-	 * @return string
-	 */
-	public static function get_api_key() {
-		$settings = get_option( 'woocommerce_addresstoolkit_settings' );
-		return $settings['api_key'] ?? false;
-	}
-
-	/**
 	 * Enqueue styles and scripts.
 	 *
 	 * @return void
@@ -54,7 +44,7 @@ class Enqueue {
 			return;
 		}
 
-		$api_key = self::get_api_key();
+		$api_key = get_option( 'addresskit_api_key', false );
 
 		// We need the API to continue.
 		if ( ! $api_key ) {

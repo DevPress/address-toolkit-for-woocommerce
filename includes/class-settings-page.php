@@ -2,69 +2,74 @@
 namespace Address_Toolkit;
 
 /**
- * Class Settings_Page.
+ * Address_Toolkit/Settings
  */
-class Settings_Page extends \WC_Integration {
+class Settings extends \WC_Settings_Page {
 
 	/**
-	 * Initialize the integration.
+	 * Constructor.
 	 */
 	public function __construct() {
-		$this->id                 = 'addresstoolkit';
-		$this->method_title       = __( 'Address Toolkit', 'address-toolkit' );
-		$this->method_description = __( 'An integration with Google Cloud APIs for address autocomplete and verification.', 'address-toolkit' );
+		$this->id    = 'address-toolkit';
+		$this->label = __( 'Address Toolkit', 'address-toolkit' );
 
-		// Load the settings.
-		$this->init_form_fields();
-		$this->init_settings();
-
-		// Actions.
-		add_action( 'woocommerce_update_options_integration_' . $this->id, array( $this, 'process_admin_options' ) );
+		parent::__construct();
 	}
 
 	/**
-	 * Initialize integration settings form fields.
-	 */
-	public function init_form_fields() {
-		$this->form_fields = $this->get_settings();
-	}
-
-	/**
-	 * Returns the settings array.
+	 * Get settings or the default section.
 	 *
 	 * @return array
 	 */
-	public function get_settings() {
-		return array(
-			'api_key' => array(
-				'id'          => 'addresstoolkit_api_key',
-				'title'       => __( 'Google Cloud API Key', 'address-toolkit' ),
-				'type'        => 'password',
-				'description' => 'Enter API key for address autocomplete. <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">Google API Key</a>.',
-				'css'         => 'min-width:300px;',
-			),
+	protected function get_settings_for_default_section() {
 
-			// @todo Add country_restrictions with multi_select_countries type.
-			'example' => array(
-				'title'   => __( 'Sell to specific countries', 'woocommerce' ),
-				'desc'    => '',
-				'id'      => 'woocommerce_specific_allowed_countries',
-				'css'     => 'min-width: 350px;',
-				'default' => '',
-				'type'    => 'multi_select_countries',
-			),
-		);
-	}
+		$settings =
+			array(
 
-	/**
-	 * Output the gateway settings screen.
-	 */
-	public function admin_options() {
-		echo '<h2>' . esc_html( parent::get_method_title() ) . '</h2>';
-		echo wp_kses_post( wpautop( parent::get_method_description() ) );
-		echo '<div><input type="hidden" name="section" value="' . esc_attr( $this->id ) . '" /></div>';
-		\WC_Admin_Settings::output_fields(
-			$this->get_settings()
-		);
+				array(
+					'title' => __( 'Google Cloud Integration', 'address-toolkit' ),
+					'type'  => 'title',
+					'desc'  => __( 'Address autocomplete and address verification requires a connection to the Google Places API.', 'address-toolkit' ),
+					'id'    => 'addresskit_google_cloud',
+				),
+
+				array(
+					'title'   => __( 'Google Cloud API Key', 'address-toolkit' ),
+					'desc'    => sprintf(
+						__( 'Generate your <a href="%s" target="_blank">Google API Key</a>.', 'address-toolkit' ),
+						'https://developers.google.com/maps/documentation/javascript/get-api-key',
+					),
+					'id'      => 'addresskit_api_key',
+					'default' => '',
+					'type'    => 'password',
+				),
+
+				array(
+					'type' => 'sectionend',
+					'id'   => 'autocomplete_settings',
+				),
+
+				array(
+					'title' => __( 'Address Autocomplete', 'address-toolkit' ),
+					'type'  => 'title',
+					'desc'  => '',
+					'id'    => 'addresskit_autocomplete',
+				),
+
+				array(
+					'title'   => __( 'Restrict to specific countries', 'address-toolkit' ),
+					'desc'    => '',
+					'id'      => 'addresskit_allowed_countries',
+					'css'     => 'min-width: 350px;',
+					'default' => '',
+					'type'    => 'multi_select_countries',
+				),
+
+				array(
+					'type' => 'sectionend',
+				),
+			);
+
+		return apply_filters( 'address_toolkit_settings', $settings );
 	}
 }
