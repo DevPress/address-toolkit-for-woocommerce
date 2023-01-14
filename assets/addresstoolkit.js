@@ -8,6 +8,9 @@ class AddressToolkit {
 		document.addEventListener("DOMContentLoaded", this.initFields, false);
 	}
 
+	/**
+	 * If the address fields exist, initialize autocomplete.
+	 */
 	initFields = () => {
 		const billingField = document.getElementById("billing_address_1");
 		if (billingField) {
@@ -20,6 +23,11 @@ class AddressToolkit {
 		}
 	};
 
+	/**
+	 * Initizalizes Google Places Autocomplete on the address field.
+	 *
+	 * Adds listeners for country selector changes and autocomplete selection.
+	 */
 	initAutocomplete = (field, type) => {
 		const fieldInputs = {
 			address1: field,
@@ -29,24 +37,44 @@ class AddressToolkit {
 			postcode: document.getElementById(`${type}_postcode`),
 		};
 
+		// Gets supported countries for the address type (billing or shipping).
+		// Returns an array if 5 or less countries are supported, otherwise null.
+		const supportedCountries = this.getSupportedCountries(
+			fieldInputs.country
+		);
+
 		// Initialize Places Autocomplete on Address 1.
 		const address = new google.maps.places.Autocomplete(field, {
 			types: ["address"],
 			// Scoping the fields help reduce API charges.
 			fields: ["address_component"],
+			country: supportedCountries ?? null,
 		});
 
-		// If the country value field is set, we'll only return results from that country.
-		this.setCountryRestriction(address, fieldInputs.country.value);
+		if (fieldInputs.country.value) {
+			this.setCountryRestriction(
+				address,
+				fieldInputs.country.value,
+				supportedCountries
+			);
+		}
 
 		// If the country selector is a select2 field, we need to use jQuery to listen for changes.
 		if (window.jQuery) {
 			jQuery(`#${type}_country`).on("change", () => {
-				this.setCountryRestriction(address, fieldInputs.country.value);
+				this.setCountryRestriction(
+					address,
+					fieldInputs.country.value,
+					supportedCountries
+				);
 			});
 		} else {
 			fieldInputs.country.addEventListener("change", () => {
-				this.setCountryRestriction(address, fieldInputs.country.value);
+				this.setCountryRestriction(
+					address,
+					fieldInputs.country.value,
+					supportedCountries
+				);
 			});
 		}
 
@@ -56,26 +84,28 @@ class AddressToolkit {
 		});
 	};
 
-	setCountryRestriction = (address, country) => {
-		if (!country) {
-			return;
+	/**
+	 * Sets the countries that address results will be returned for.
+	 */
+	setCountryRestriction = (address, country, countryAllowList = []) => {
+		if (country) {
+			// @TODO Check if country is restricted.
+			countryAllowList = [country];
 		}
 
-		// If autocomplete is restricted to specific countries,
-		// return early if the selected country is not in the list.
-		// @TODO
-
 		address.setComponentRestrictions({
-			country: country,
+			country: countryAllowList,
 		});
 	};
 
+	/**
+	 * Parse the address components returned by Google Places.
+	 */
 	parsePlace = (address, fieldInputs) => {
 		console.log("place change");
 		let place = address.getPlace();
 		let streetNumber = "";
 		let route = "";
-		console.log(place);
 
 		for (let i = 0; i < place.address_components.length; i++) {
 			const type = place.address_components[i].types[0];
@@ -139,6 +169,35 @@ class AddressToolkit {
 
 		// Populate address1 field.
 		fieldInputs.address1.value = streetNumber + " " + route;
+	};
+
+	/**
+	 * The billing and shipping address can support multiple countries.
+	 * If the country field has been selected, we'll return results only for that country.
+	 * But as a fallback, we'll show results from any supported country as long as there are less than 5.
+	 * Google Places doesn't not support country restrictions if there are more than 5.
+	 */
+	getSupportedCountries = (countryField) => {
+		// We expect the country field to be a select element.
+		if (!countryField.tagName == "SELECT") {
+			return null;
+		}
+
+		let countries = [];
+		Array.prototype.forEach.call(countryField.options, (option) => {
+			if (option.value) {
+				countries.push(option.value);
+			}
+		});
+
+		// @TODO Remove restricted countries from array.
+
+		// Google Places only supports 5 countries at a time.
+		if (countries.length > 1 && countries.length <= 5) {
+			return countries;
+		}
+
+		return null;
 	};
 }
 
