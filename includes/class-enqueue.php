@@ -55,15 +55,15 @@ class Enqueue {
 		wp_enqueue_style(
 			'addresstoolkit',
 			Address_Toolkit::$url . 'assets/addresstoolkit.css',
-			'',
-			Address_Toolkit::$version . 'assets/addresstoolkit.css'
+			array(),
+			Address_Toolkit::$version,
 		);
 
 		// Google API library.
 		wp_enqueue_script(
-			'google-api',
+			'addresskit-google-places-api',
 			'https://maps.googleapis.com/maps/api/js?key=' . esc_attr( $api_key ) . '&libraries=places',
-			array( 'jquery' ),
+			array(),
 			'1.0.0',
 			true
 		);
@@ -72,8 +72,8 @@ class Enqueue {
 		wp_enqueue_script(
 			'addresstoolkit',
 			Address_Toolkit::$url . 'assets/addresstoolkit.js',
-			array( 'jquery' ),
-			Address_Toolkit::$version . 'assets/addresstoolkit.js',
+			array( 'addresskit-google-places-api' ),
+			Address_Toolkit::$version,
 			true
 		);
 
