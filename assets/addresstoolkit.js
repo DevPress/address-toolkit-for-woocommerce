@@ -172,14 +172,31 @@ class AddressToolkit {
 	};
 
 	/**
-	 * The billing and shipping address can support multiple countries.
-	 * If the country field has been selected, we'll return results only for that country.
-	 * But as a fallback, we'll show results from any supported country as long as there are less than 5.
-	 * Google Places doesn't not support country restrictions if there are more than 5.
+	 * Returns the supported countries.
+	 *
+	 * If shop admin has restricted autocomplete to specific countries, we'll use those.
+	 * If only one country is available, we'll return that.
+	 * If multiple countries are supported, we'll return those.
+	 *
+	 * Google Places only supports country restrictions to 5 or less,
+	 * so if supported countries is more than 5 we need to allow autcomplete for all countries but filter results.
 	 */
 	getSupportedCountries = (countryField) => {
-		// We expect the country field to be a select element.
-		if (!countryField.tagName == "SELECT") {
+		// Get allowed countries if this setting is enabled.
+		const allowedCountries = this.getAllowedCountries();
+
+		// Google Places only supports 5 countries at a time.
+		if (allowedCountries.length > 1 && allowedCountries.length <= 5) {
+			return allowedCountries;
+		}
+
+		// If there's only one country, this field should be an INPUT element.
+		if (countryField.tagName === "INPUT") {
+			return countryField.value ?? null;
+		}
+
+		// Otherwise we expect this field to be a SELECT element.
+		if (countryField.tagName !== "SELECT") {
 			return null;
 		}
 
@@ -190,14 +207,31 @@ class AddressToolkit {
 			}
 		});
 
-		// @TODO Remove restricted countries from array.
-
 		// Google Places only supports 5 countries at a time.
 		if (countries.length > 1 && countries.length <= 5) {
 			return countries;
 		}
 
 		return null;
+	};
+
+	/**
+	 * If shop admin has restricted autocomplete to specific countries, these will be returned.
+	 *
+	 * @return array
+	 */
+	getAllowedCountries = () => {
+		// If no settings are available, return null.
+		if (typeof addresstoolkit === "undefined") {
+			return [];
+		}
+
+		const allowedCountries = addresstoolkit.allowed_countries ?? null;
+		if (allowedCountries) {
+			return allowedCountries.split(",");
+		}
+
+		return [];
 	};
 }
 

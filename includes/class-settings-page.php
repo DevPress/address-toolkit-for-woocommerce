@@ -36,7 +36,7 @@ class Settings extends \WC_Settings_Page {
 				array(
 					'title'   => __( 'Google Cloud API Key', 'address-toolkit' ),
 					'desc'    => sprintf(
-						__( 'Generate your <a href="%s" target="_blank">Google API Key</a>.', 'address-toolkit' ),
+						__( 'Generate a <a href="%s" target="_blank">Google API Key</a>.', 'address-toolkit' ),
 						'https://developers.google.com/maps/documentation/javascript/get-api-key',
 					),
 					'id'      => 'addresskit_api_key',
@@ -57,8 +57,16 @@ class Settings extends \WC_Settings_Page {
 				),
 
 				array(
+					'title'   => __( 'Enable on checkout page', 'address-toolkit' ),
+					'desc'    => __( 'Enables address autocomplete for shipping and billing fields on checkout.', 'woocommerce' ),
+					'id'      => 'addresskit_enable_autocomplete_checkout',
+					'default' => 'yes',
+					'type'    => 'checkbox',
+				),
+
+				array(
 					'title'   => __( 'Restrict to specific countries', 'address-toolkit' ),
-					'desc'    => '',
+					'desc'    => 'Leave blank to enable autocomplete suggestions for all countries you sell to.',
 					'id'      => 'addresskit_allowed_countries',
 					'css'     => 'min-width: 350px;',
 					'default' => '',

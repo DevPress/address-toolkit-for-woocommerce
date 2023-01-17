@@ -78,13 +78,15 @@ class Enqueue {
 		);
 
 		// Add vars to the script.
-		wp_localize_script(
-			'addresstoolkit',
-			'addresstoolkit',
-			array(
-				'country_restrictions' => '',
-			)
-		);
+		$allowed_countries = get_option( 'addresskit_allowed_countries', false );
+		if ( $allowed_countries ) {
+			wp_localize_script(
+				'addresstoolkit',
+				'addresstoolkit',
+				array(
+					'allowed_countries' => implode( ',', $allowed_countries ),
+				)
+			);
+		}
 	}
-
 }
